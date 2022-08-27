@@ -1,12 +1,6 @@
 {
   "heroes": [
     {
-      "id": 3,
-      "name": "Морской герой",
-      "description": "Как аквамен, но не из DC",
-      "element": "water"
-    },
-    {
       "id": "279d8dbb-284f-4301-b397-4aac66357347",
       "name": "Sets and Maps",
       "description": "asdas",

@@ -6,11 +6,30 @@ export const apiSlice = createApi({
     baseQuery: fetchBaseQuery({
         baseUrl: 'http://localhost:3001'
     }),
+    tagTypes: ['Heroes'],
     endpoints: builder => ({
         getHeroes: builder.query({
-            query: () => '/heroes'
+            query: () => '/heroes',
+            providesTags: ['Heroes']
+        }),
+
+        createHero: builder.mutation({
+            query: heroes => ({
+                url: '/heroes',
+                method: 'POST',
+                body: heroes
+            }),
+            invalidatesTags: ['Heroes']
+        }),
+
+        deleteHeroes: builder.mutation({
+            query: id => ({
+                url: `/heroes/${id}`,
+                method: 'DELETE'
+            }),
+            invalidatesTags: ['Heroes']
         })
     })
 })
 
-export const {useGetHeroesQuery} = apiSlice;
+export const {useGetHeroesQuery, useCreateHeroMutation, useDeleteHeroesMutation} = apiSlice;
