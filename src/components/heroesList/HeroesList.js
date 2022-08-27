@@ -1,32 +1,36 @@
 import {useHttp} from '../../hooks/http.hook';
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { CSSTransition, TransitionGroup} from 'react-transition-group';
-import { createSelector } from '@reduxjs/toolkit';
 
 import { heroDeleted } from './heroesSlice';
-import { fetchHeroes, selectAll } from './heroesSlice';
+import { fetchHeroes } from './heroesSlice';
 import HeroesListItem from "../heroesListItem/HeroesListItem";
+import { useGetHeroesQuery } from '../../api/apiSlice';
 import Spinner from '../spinner/Spinner';
 
 import './heroesList.scss';
 
 const HeroesList = () => {
 
-    const filteredHeroesSelector = createSelector(
-        (state) => state.filters.activeFilter,
-        selectAll,
-        (filter, heroes) => {
-            if (filter === 'all') {
-                return heroes;
-            } else {
-                return heroes.filter(item => item.element === filter);
-            }
-        }
-    );
+    const {
+        data: heroes = [],
+        isLoading,
+        isError,
+    } = useGetHeroesQuery();
 
-    const filteredHeroes = useSelector(filteredHeroesSelector);
-    const heroesLoadingStatus = useSelector(state => state.heroes.heroesLoadingStatus);
+    const activeFilter = useSelector(state => state.filters.activeFilter)
+
+    const filteredHeroes = useMemo(() => {
+        const filteredHeroe = heroes.slice();
+        if (activeFilter === 'all') {
+            return filteredHeroe
+        } else {
+            return filteredHeroe.filter(item => item.element === activeFilter)
+        }
+    }, [heroes, activeFilter])
+
+   
     const dispatch = useDispatch();
     const {request} = useHttp();
 
@@ -43,9 +47,9 @@ const HeroesList = () => {
         // eslint-disable-next-line  
     }, [request]);
 
-    if (heroesLoadingStatus === "loading") {
+    if (isLoading) {
         return <Spinner/>;
-    } else if (heroesLoadingStatus === "error") {
+    } else if (isError) {
         return <h5 className="text-center mt-5">Ошибка загрузки</h5>
     }
 
